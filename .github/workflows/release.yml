@@ -10,6 +10,10 @@ env:
   # CI環境でもカラフルなログを出力して視認性を向上
   CARGO_TERM_COLOR: always
 
+# リリースの作成とアセットのアップロードに必要な権限
+permissions:
+  contents: write
+
 jobs:
   create-release:
     name: Create Release
