@@ -1,0 +1,25 @@
+{
+  // rust-analyzerの設定
+  "rust-analyzer.check.command": "clippy",
+  "rust-analyzer.checkOnSave": true,
+  "rust-analyzer.cargo.features": "all",
+
+  // フォーマット設定
+  "[rust]": {
+    "editor.defaultFormatter": "rust-lang.rust-analyzer",
+    "editor.formatOnSave": true
+  },
+
+  // インレイヒント設定（型情報の表示）
+  "rust-analyzer.inlayHints.typeHints.enable": true,
+  "rust-analyzer.inlayHints.parameterHints.enable": true,
+  "rust-analyzer.inlayHints.chainingHints.enable": true,
+
+  // ビルドターゲットの設定
+  "rust-analyzer.cargo.buildScripts.enable": true,
+
+  // エディタ設定
+  "editor.rulers": [100],
+  "files.trimTrailingWhitespace": true,
+  "files.insertFinalNewline": true
+}

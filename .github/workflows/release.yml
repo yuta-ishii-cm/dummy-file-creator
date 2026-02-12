@@ -1,0 +1,84 @@
+name: Release
+
+on:
+  push:
+    tags:
+      # v0.1.0, v1.0.0 などのタグをpushした時に実行
+      - 'v*'
+
+env:
+  # CI環境でもカラフルなログを出力して視認性を向上
+  CARGO_TERM_COLOR: always
+
+jobs:
+  create-release:
+    name: Create Release
+    runs-on: ubuntu-latest
+    outputs:
+      upload_url: ${{ steps.create_release.outputs.upload_url }}
+      version: ${{ steps.get_version.outputs.version }}
+    steps:
+      - name: タグからバージョンを取得
+        id: get_version
+        run: echo "version=${GITHUB_REF#refs/tags/v}" >> $GITHUB_OUTPUT
+
+      - name: リリースの作成
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: Release ${{ github.ref }}
+          draft: false
+          prerelease: false
+
+  build-release:
+    name: Build Release
+    needs: create-release
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        # 各プラットフォーム向けのバイナリをビルド
+        include:
+          - os: ubuntu-latest
+            target: x86_64-unknown-linux-gnu
+            artifact_name: fgen
+            asset_name: fgen-linux-x86_64
+          - os: macos-latest
+            target: x86_64-apple-darwin
+            artifact_name: fgen
+            asset_name: fgen-macos-x86_64
+          - os: macos-latest
+            target: aarch64-apple-darwin # Apple Silicon (M1/M2/M3)
+            artifact_name: fgen
+            asset_name: fgen-macos-aarch64
+          - os: windows-latest
+            target: x86_64-pc-windows-msvc
+            artifact_name: fgen.exe
+            asset_name: fgen-windows-x86_64.exe
+
+    defaults:
+      run:
+        working-directory: ./fgen
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Rustのセットアップ
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ matrix.target }}
+
+      - name: ビルド
+        run: cargo build --release --target ${{ matrix.target }}
+
+      - name: リリースアセットのアップロード
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ needs.create-release.outputs.upload_url }}
+          asset_path: ./fgen/target/${{ matrix.target }}/release/${{ matrix.artifact_name }}
+          asset_name: ${{ matrix.asset_name }}
+          asset_content_type: application/octet-stream

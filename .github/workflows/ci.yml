@@ -1,0 +1,138 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+      - 'feature/**' # featureブランチでも開発中から品質をチェック
+  pull_request:
+    branches: [main]
+
+env:
+  # CI環境でもカラフルなログを出力して視認性を向上
+  CARGO_TERM_COLOR: always
+
+jobs:
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./fgen
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Rustのセットアップ
+        uses: dtolnay/rust-toolchain@stable
+
+      # 依存関係のダウンロード時間を短縮するためキャッシュを活用
+      - name: cargoレジストリのキャッシュ
+        uses: actions/cache@v4
+        with:
+          path: ~/.cargo/registry
+          key: ${{ runner.os }}-cargo-registry-${{ hashFiles('**/Cargo.lock') }}
+
+      - name: cargoインデックスのキャッシュ
+        uses: actions/cache@v4
+        with:
+          path: ~/.cargo/git
+          key: ${{ runner.os }}-cargo-index-${{ hashFiles('**/Cargo.lock') }}
+
+      - name: cargoビルドのキャッシュ
+        uses: actions/cache@v4
+        with:
+          path: fgen/target
+          key: ${{ runner.os }}-cargo-build-target-${{ hashFiles('**/Cargo.lock') }}
+
+      - name: テストの実行
+        run: cargo test --verbose
+
+  fmt:
+    name: Format Check
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./fgen
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Rustのセットアップ
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          components: rustfmt
+
+      - name: フォーマットチェック
+        run: cargo fmt -- --check
+
+  clippy:
+    name: Clippy
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./fgen
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Rustのセットアップ
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          components: clippy
+
+      - name: cargoレジストリのキャッシュ
+        uses: actions/cache@v4
+        with:
+          path: ~/.cargo/registry
+          key: ${{ runner.os }}-cargo-registry-${{ hashFiles('**/Cargo.lock') }}
+
+      - name: cargoインデックスのキャッシュ
+        uses: actions/cache@v4
+        with:
+          path: ~/.cargo/git
+          key: ${{ runner.os }}-cargo-index-${{ hashFiles('**/Cargo.lock') }}
+
+      - name: cargoビルドのキャッシュ
+        uses: actions/cache@v4
+        with:
+          path: fgen/target
+          key: ${{ runner.os }}-cargo-clippy-target-${{ hashFiles('**/Cargo.lock') }}
+
+      # 警告もエラーとして扱うことでコード品質を維持
+      - name: Clippyの実行
+        run: cargo clippy -- -D warnings
+
+  build:
+    name: Build
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        # 主要3プラットフォームでビルドが通ることを確認
+        os: [ubuntu-latest, macos-latest, windows-latest]
+    defaults:
+      run:
+        working-directory: ./fgen
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Rustのセットアップ
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: cargoレジストリのキャッシュ
+        uses: actions/cache@v4
+        with:
+          path: ~/.cargo/registry
+          key: ${{ runner.os }}-cargo-registry-${{ hashFiles('**/Cargo.lock') }}
+
+      - name: cargoインデックスのキャッシュ
+        uses: actions/cache@v4
+        with:
+          path: ~/.cargo/git
+          key: ${{ runner.os }}-cargo-index-${{ hashFiles('**/Cargo.lock') }}
+
+      - name: cargoビルドのキャッシュ
+        uses: actions/cache@v4
+        with:
+          path: fgen/target
+          key: ${{ runner.os }}-cargo-build-target-${{ hashFiles('**/Cargo.lock') }}
+
+      - name: ビルド
+        run: cargo build --release --verbose

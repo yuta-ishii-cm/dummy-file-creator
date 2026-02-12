@@ -52,8 +52,7 @@ fn parse_size(s: &str) -> Result<u64, String> {
             .map_err(|e| format!("Invalid size: {}", e))
     // すべて None だった場合（単位なしの数値として扱う）
     } else {
-        s.parse::<u64>()
-            .map_err(|e| format!("Invalid size: {}", e))
+        s.parse::<u64>().map_err(|e| format!("Invalid size: {}", e))
     }
 }
 
