@@ -103,7 +103,3 @@ git push origin v0.1.0
 ```
 
 タグをpushすると、自動的にGitHub Releasesにバイナリが公開されます。
-
-## ライセンス
-
-MIT License
