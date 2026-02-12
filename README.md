@@ -33,16 +33,16 @@ cargo build --release
 
 ```bash
 # 100MBのダミーファイルを生成
-fgen new output.dat 100MB
+fgen new dummy.txt 100MB
 
 # 1GBのダミーファイルを生成
-fgen new large.dat 1GB
+fgen new largefile.txt 1GB
 
 # 512KBのダミーファイルを生成
-fgen new small.dat 512KB
+fgen new testdata.txt 512KB
 
 # バイト単位で指定（1024バイト）
-fgen new tiny.dat 1024
+fgen new sample.txt 1024
 ```
 
 ### サイズ指定
