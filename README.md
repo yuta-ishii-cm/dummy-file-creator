@@ -1,6 +1,6 @@
 # fgen
 
-![CI](https://github.com/YOUR_USERNAME/dummy-file-creator/workflows/CI/badge.svg)
+![CI](https://github.com/yuta-ishii-cm/dummy-file-creator/workflows/CI/badge.svg)
 
 指定サイズ（KB/MB/GB）のダミーファイルを簡単に生成できるRust製CLIツールです。
 ディスク容量のテストや、ファイル転送速度の検証などに便利です。
@@ -16,7 +16,7 @@
 
 ### バイナリをダウンロード
 
-[Releases](https://github.com/YOUR_USERNAME/dummy-file-creator/releases)から、お使いのプラットフォーム向けのバイナリをダウンロードしてください。
+[Releases](https://github.com/yuta-ishii-cm/dummy-file-creator/releases)から、お使いのプラットフォーム向けのバイナリをダウンロードしてください。
 
 ### ソースからビルド
 
