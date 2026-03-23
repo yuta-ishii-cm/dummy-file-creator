@@ -25,6 +25,7 @@ target
 
 # Blog files
 blogs/
+articles/
 
 # CDK project (separate repository)
 github-code-scanning-slack-cdk/
